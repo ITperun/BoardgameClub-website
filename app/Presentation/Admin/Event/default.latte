@@ -1,0 +1,55 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">Správa událostí</h2>
+    <a n:href="edit" class="btn btn-success mb-3">+ Přidat</a>
+
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Název</th>
+                <th>Místo</th>
+                <th>Stav zápisu</th> <th>Moderace</th> <th>Začátek</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $events as $event}
+                <tr>
+                    <td>{$event->title}</td>
+                    <td>{$event->location}</td>
+                    
+                    <td>
+                        {if $event->status === 'open'}
+                            <span class="badge bg-success">Otevřeno</span>
+                        {else}
+                            <span class="badge bg-secondary">Zavřeno</span>
+                        {/if}
+                    </td>
+
+                    <td>
+                        {var $mod = $event->related('event_moderation')->fetch()}
+                        {if $mod}
+                            {if $mod->status === 'approved'}
+                                <span class="badge bg-success">✅ Schváleno</span>
+                            {elseif $mod->status === 'rejected'}
+                                <span class="badge bg-danger">❌ Zamítnuto</span>
+                            {else}
+                                <span class="badge bg-warning text-dark">⏳ Čeká</span>
+                            {/if}
+                        {else}
+                            <span class="text-muted">N/A</span>
+                        {/if}
+                    </td>
+
+                    <td>{$event->start_time|date:'j.n.Y H:i'}</td>
+                    <td>
+                        <a n:href="edit, id => $event->id" class="btn btn-sm btn-primary">Upravit</a>
+                        <a n:href="delete! id => $event->id" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Opravdu smazat tuto událost?')">Smazat</a>
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+</div>
+{/block}

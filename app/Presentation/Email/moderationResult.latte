@@ -1,0 +1,38 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Moderace události</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.5; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #007bff; }
+        .content { padding: 20px; }
+        .status-approved { color: green; font-weight: bold; }
+        .status-rejected { color: red; font-weight: bold; }
+        .footer { font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dobrý den, {$name}!</h1>
+    </div>
+    
+    <div class="content">
+        <p>Máme pro Vás zprávu ohledně Vaší události: <strong>{$eventTitle}</strong>.</p>
+        
+        <p>Stav moderace: 
+            <span n:class="$status === 'approved' ? status-approved : status-rejected">
+                {$status === 'approved' ? 'Schváleno' : 'Zamítnuto'}
+            </span>
+        </p>
+
+        <p n:if="$status === 'approved'">Vaše událost je nyní viditelná pro ostatní uživatele v kalendáři.</p>
+        <p n:if="$status === 'rejected'">Bohužel Vaše událost nesplňuje pravidla a byla skryta. V případě dotazů nás kontaktujte.</p>
+
+        <p>Děkujeme, že používáte náš portál.</p>
+    </div>
+
+    <div class="footer">
+        Toto je automaticky generovaný e-mail, neodpovídejte na něj.
+    </div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+{import '../form-bootstrap5.latte'}
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>{ifset title}{include title|stripHtml} | {/ifset}Administrace | Klub deskových her</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --admin-main: #d63384; /* Elysia Pink */
+            --admin-dark: #9d175b;
+            --admin-light: #fce4ec;
+            --bg-body: #f1f5f9; /* Чуть более темный фон для контраста с белыми карточками дашборда */
+            --bg-card: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: var(--bg-body);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* NAVBAR */
+        .admin-navbar {
+            background: linear-gradient(135deg, var(--admin-dark), var(--admin-main));
+            box-shadow: var(--shadow-sm);
+            padding: 0.8rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            font-size: 1.4rem;
+        }
+        
+        /* NAV LINKS */
+        .nav-link {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin: 0 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* USER DROPDOWN */
+        .user-dropdown-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.3rem 1rem 0.3rem 0.3rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .user-dropdown-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .user-dropdown-toggle img {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-menu {
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+            box-shadow: var(--shadow-lg);
+            padding: 0.5rem;
+            min-width: 220px;
+        }
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background-color: var(--admin-light);
+            color: var(--admin-dark);
+        }
+        .dropdown-item.text-danger:hover {
+            background-color: #fee2e2;
+            color: #b91c1c !important;
+        }
+
+        /* MAIN CONTENT */
+        .admin-content-wrapper {
+            margin-top: 2rem;
+            margin-bottom: 4rem;
+        }
+        .admin-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2e8f0;
+            padding: 2.5rem;
+        }
+
+        /* ALERTS */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark admin-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-white" n:href=":Front:Home:default">
+                <i class="bi bi-shield-lock-fill me-2 opacity-75"></i>Administrace
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a n:href=":Front:Home:default" n:class="'nav-link', $presenter->isLinkCurrent(':Front:Home:*') ? active">
+                            <i class="bi bi-house-door"></i> Domů
+                        </a>
+                    </li>
+                    <li class="nav-item" n:if="$user->isInRole('admin')">
+                        <a n:href="User:default" class="nav-link">
+                            <i class="bi bi-people"></i> Uživatelé
+                        </a>
+                    </li>
+                    <li class="nav-item" n:if="$user->isInRole('admin')">
+                        <a n:href="Game:default" class="nav-link">
+                            <i class="bi bi-controller"></i> Hry
+                        </a>
+                    </li>
+                    {if $user->isInRole('admin') || $user->isInRole('moderator')}
+                        <li class="nav-item">
+                            <a n:href=":Admin:Event:moderation" n:class="'nav-link', $presenter->isLinkCurrent(':Admin:Event:moderation') ? active">
+                                <i class="bi bi-shield-check"></i> Moderování
+                            </a>
+                        </li>
+                    {/if}
+                    <li class="nav-item">
+                        <a n:href=":Admin:Event:default" n:class="'nav-link', $presenter->isLinkCurrent(':Admin:Event:*') ? active">
+                            <i class="bi bi-calendar-event"></i> Události
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a n:href=":Admin:Search:default" n:class="'nav-link', $presenter->isLinkCurrent(':Admin:Search:*') ? active">
+                            <i class="bi bi-search"></i> Hledat
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    {if $user->isLoggedIn()}
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle user-dropdown-toggle" id="dropdownAdminUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{$basePath}/{$user->identity->image ?: 'upload/avatars/default.png'}" 
+                                     alt="Avatar" 
+                                     width="40" height="40" 
+                                     class="rounded-circle me-2 object-fit-cover bg-white">
+                                <div class="d-flex flex-column lh-1 me-2 text-start">
+                                    <small class="opacity-75" style="font-size: 0.75rem; font-weight: 500;">Admin</small>
+                                    <span class="fw-bold" style="font-size: 0.95rem;">{$user->identity->firstname}</span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="dropdownAdminUser">
+                                <li class="px-3 py-2 text-center border-bottom mb-1">
+                                    <small class="text-muted d-block mb-1">Přihlášen jako</small>
+                                    <strong>{$user->identity->firstname} {$user->identity->lastname}</strong>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item mt-1" n:href=":Front:Profile:default">
+                                        <i class="bi bi-person me-2 opacity-75"></i> Můj profil
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger fw-medium" n:href=":Front:Sign:out">
+                                        <i class="bi bi-box-arrow-right me-2 opacity-75"></i> Odhlásit
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {else}
+                        <a n:href=":Front:Sign:in" class="btn btn-light fw-bold me-2" style="color: var(--admin-main);">Přihlásit</a>
+                        <a n:href=":Front:Sign:up" class="btn btn-outline-light fw-medium">Registrovat</a>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container admin-content-wrapper">
+        {* Flash messages *}
+        <div n:foreach="$flashes as $flash" n:class="alert, 'alert-' . $flash->type, alert-dismissible, fade, show, mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i> {$flash->message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        {* Main Content Card *}
+        <div class="admin-card">
+            {include content}
+        </div>
+    </main>
+
+    {block scripts}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/nette-forms@3"></script>
+    {/block}
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Application parameters and settings. See https://doc.nette.org/configuring
+
+parameters:
+
+
+application:
+	# Presenter mapping pattern
+	mapping: App\Presentation\*\**Presenter
+
+
+database:
+	dsn: 'mysql:host=127.0.0.1;dbname=mop'
+	user:
+	password:
+
+mail:
+	smtp: true

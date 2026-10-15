@@ -1,0 +1,12 @@
+database:
+    dsn: 'mysql:host=127.0.0.1;dbname='
+    user: 
+    password: ''
+
+mail:
+    smtp: true
+    host: 'smtp.seznam.cz'
+    port: 465
+    username: 'your-email@seznam.cz'
+    password: 'your-password'
+    secure: 'ssl'

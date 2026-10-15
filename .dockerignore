@@ -1,0 +1,7 @@
+temp/*
+!temp/.gitignore
+log/*
+!log/.gitignore
+vendor/
+.git/
+config/local.neon

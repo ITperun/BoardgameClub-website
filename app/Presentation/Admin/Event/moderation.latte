@@ -1,0 +1,42 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">⏳ Moderování událostí</h2>
+
+    {if count($events) > 0}
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Název</th>
+                        <th>Organizátor</th>
+                        <th>Místo</th>
+                        <th>Začátek</th>
+                        <th>Akce</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $events as $event}
+                        <tr>
+                            <td><strong>{$event->title}</strong></td>
+                            <td>
+                                {if $event->ref('users', 'organizer_id')}
+                                    {$event->ref('users', 'organizer_id')->firstname} {$event->ref('users', 'organizer_id')->lastname}
+                                {else}
+                                    —
+                                {/if}
+                            </td>
+                            <td>{$event->location}</td>
+                            <td>{$event->start_time|date:'j.n.Y H:i'}</td>
+                            <td>
+                                <a n:href="moderationDetail id => $event->id" class="btn btn-sm btn-primary">Zkontrolovat</a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    {else}
+        <div class="alert alert-success">✅ Žádné události ke schválení.</div>
+    {/if}
+</div>
+{/block}

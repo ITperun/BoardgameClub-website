@@ -1,0 +1,20 @@
+{block content}
+<h2>Upravit uživatele</h2>
+
+{if $userData->image}
+    <div class="mb-3">
+        <img src="{$basePath}/{$userData->image}" 
+             alt="Avatar" 
+             style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
+        <br>
+        <a n:href="deleteImage! $userData->id" 
+           class="btn btn-sm btn-outline-danger"
+           onclick="return confirm('Opravdu chcete smazat tento obrázek?')">
+            Smazat obrázek
+        </a>
+    </div>
+{/if}
+
+
+{control editForm}
+{/block}

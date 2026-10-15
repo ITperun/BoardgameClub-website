@@ -1,0 +1,14 @@
+{block content}
+<h2>Seznam událostí</h2>
+
+<ul>
+{foreach $events as $event}
+    <li>
+        <a href="{$presenter->link('detail', ['id' => $event->id])}">
+            {$event->title} ({$event->start_time|date:'j.n.Y H:i'})
+        </a>
+        — {$event->location}
+    </li>
+{/foreach}
+</ul>
+{/block}

@@ -1,0 +1,12 @@
+parameters:
+	level: 10
+
+	paths:
+		- app
+
+	fileExtensions:
+		- php
+
+includes:
+	- vendor/phpstan/phpstan-nette/extension.neon
+	- vendor/phpstan/phpstan-nette/rules.neon

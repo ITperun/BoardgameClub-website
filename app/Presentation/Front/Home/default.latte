@@ -1,0 +1,295 @@
+{block content}
+
+<style>
+/* ==== HERO SECTION ==== */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    background: url("../upload/club_bg_big.jpg") center center / cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+.hero-overlay {
+    position: relative;
+    z-index: 2;
+}
+.hero-title {
+    font-size: 4rem;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #ffde00;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+}
+
+/* ==== INFO SECTION ==== */
+.info-section {
+    font-size: 1rem;
+    line-height: 1.6;
+    border-top: 3px solid #333;
+    border-bottom: 3px solid #333;
+}
+</style>
+
+<!-- ================= HERO ================= -->
+<section class="hero-section text-center text-white position-relative">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay d-flex flex-column justify-content-center align-items-center">
+        <h1 class="hero-title fw-bold">Klub deskových her</h1>
+        <p class="hero-subtitle text-uppercase fw-semibold mt-3">
+            MÍSTO, KDE SE FANTAZIE STÁVAJÍ SKUTEČNOSTÍ
+        </p>
+    </div>
+</section>
+
+<!-- ================= INFO ================= -->
+<section class="info-section py-4 bg-warning text-dark text-center fw-semibold">
+    <div class="container">
+        <p class="mb-0">
+            Klub deskových her je diskusní pořad o deskových hrách, který vysíláme živě jednou měsíčně.
+            Zaměřujeme se na naše dojmy z nejnovějších stolních her, probíráme nová oznámení a debatujeme
+            s hosty z branže – o aktuálním dění ve světě her i o jejich tvorbě.
+        </p>
+    </div>
+</section>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="container mt-5">
+
+    <!-- TEXT HEADER -->
+    <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold">
+            Objevujte nové hry, poznávejte přátele a zažijte zábavu u našeho společného stolu.
+        </h2>
+    </div>
+
+    <!-- ================= SEARCH + EVENTS LIST ================= -->
+    <div class="mb-5">
+        <h3 class="mb-3">🎲 Nadcházející události</h3>
+
+        <!-- SEARCH FORM -->
+        <div class="search-form">
+            <form n:name="searchForm" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Hledat události:</label>
+                    <input n:name="keyword" type="text" class="form-control"
+                           placeholder="Zadejte název, místo nebo popis...">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Hra:</label>
+                    <select n:name="game" class="form-select">
+                        <option value="">Všechny hry</option>
+                        {foreach $games as $id => $gname}
+                            <option value="{$id}" {if $game == $id}selected{/if}>{$gname}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input n:name="search" type="submit" value="Hledat" class="btn btn-primary w-100">
+                </div>
+                <div class="col-md-2">
+                    {if $keyword || $game}
+                        <a n:href="default" class="btn btn-outline-secondary w-100">Zrušit filtr</a>
+                    {/if}
+                </div>
+            </form>
+        </div>
+
+        <!-- SEARCH RESULT INFO -->
+        {if $keyword}
+            <div class="alert alert-info mb-3">
+                <strong>Výsledky hledání:</strong> "{$keyword}"
+                {if $eventsCount > 0}
+                    – nalezeno {$eventsCount} událostí
+                {else}
+                    – žádné události nenalezeny
+                {/if}
+                <a n:href="default" class="btn btn-sm btn-outline-info ms-2">Zobrazit všechny</a>
+            </div>
+        {/if}
+
+        <!-- PAGINATION INFO -->
+        {if $eventsCount > 0}
+            <p class="text-muted mb-3">
+                Celkem {$eventsCount} událostí • Stránka {$currentPage} z {$totalPages}
+            </p>
+        {/if}
+
+        <!-- EVENTS GRID -->
+        <div class="row">
+            {foreach $events as $event}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{$event->title}</h5>
+                            <p class="card-text text-muted mb-1">
+                                📍 {$event->location}
+                                {if $event->game} • 🎮 {$event->game->name}{/if}
+                            </p>
+                            <p class="card-text small text-secondary">
+                                🕒 {$event->start_time|date:'j.n.Y H:i'}
+                            </p>
+                            <p class="card-text">{$event->description|truncate:100}</p>
+                            <a n:href="Event:detail, id => $event->id" class="btn btn-primary btn-sm">
+                                Zobrazit detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {/foreach}
+
+            {if !count($events)}
+                <p class="text-muted">
+                    {if $keyword}
+                        Pro výraz "{$keyword}" nebyly nalezeny žádné události.
+                    {else}
+                        Žádné události zatím nejsou naplánovány.
+                    {/if}
+                </p>
+            {/if}
+        </div>
+
+        <!-- PAGINATION -->
+        {if $totalPages > 1}
+            <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+                    {if $currentPage > 1}
+                        <li class="page-item">
+                            <a n:href="default, page => $currentPage - 1, keyword => $keyword"
+                               class="page-link">Předchozí</a>
+                        </li>
+                    {else}
+                        <li class="page-item disabled">
+                            <span class="page-link">Předchozí</span>
+                        </li>
+                    {/if}
+
+                    {foreach range(1, $totalPages) as $i}
+                        <li class="page-item {if $i == $currentPage}active{/if}">
+                            <a n:href="default, page => $i, keyword => $keyword"
+                               class="page-link">{$i}</a>
+                        </li>
+                    {/foreach}
+
+                    {if $currentPage < $totalPages}
+                        <li class="page-item">
+                            <a n:href="default, page => $currentPage + 1, keyword => $keyword"
+                               class="page-link">Další</a>
+                        </li>
+                    {else}
+                        <li class="page-item disabled">
+                            <span class="page-link">Další</span>
+                        </li>
+                    {/if}
+                </ul>
+            </nav>
+        {/if}
+    </div>
+
+    <!-- ================= FEATURED GAMES ================= -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h3 class="fw-bold mb-4 text-center">⭐ Doporučené deskové hry</h3>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <img src="/upload/featured_catan.jpg" class="card-img-top" alt="Catan">
+                        <div class="card-body">
+                            <h5 class="card-title">🌄 Catan</h5>
+                            <p class="card-text">
+                                Strategická hra o budování osad a obchodování. Ideální pro rodiny i nováčky.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <img src="/upload/featured_dixit.jpg" class="card-img-top" alt="Dixit">
+                        <div class="card-body">
+                            <h5 class="card-title">🎨 Dixit</h5>
+                            <p class="card-text">
+                                Kreativní hra plná fantazie a nádherných ilustrací. Skvělá atmosféra pro skupiny.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <img src="/upload/featured_gloomhaven.jpg" class="card-img-top" alt="Gloomhaven">
+                        <div class="card-body">
+                            <h5 class="card-title">⚔️ Gloomhaven</h5>
+                            <p class="card-text">
+                                Obří kooperativní fantasy kampaň pro zkušené hráče se silným příběhem.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ================= WHAT WE OFFER ================= -->
+    <section class="py-5">
+        <div class="container">
+            <h3 class="fw-bold mb-4 text-center">🎉 Co u nás najdete?</h3>
+
+            <div class="row text-center">
+                <div class="col-md-3 mb-4">
+                    <h1>🎲</h1>
+                    <h5>Tematické večery</h5>
+                    <p>Herní dny zaměřené na různá témata a žánry stolních her.</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>🏆</h1>
+                    <h5>Turnaje</h5>
+                    <p>Pravidelné soutěže a napínavé turnaje pro hráče všech úrovní.</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>🤝</h1>
+                    <h5>Komunita</h5>
+                    <p>Seznámíš se s lidmi, kteří sdílí stejnou vášeň pro deskové hry.</p>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h1>📚</h1>
+                    <h5>Herní knihovna</h5>
+                    <p>Bohatá sbírka her, kterou můžeš zkusit během klubových akcí.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CALL TO ACTION ================= -->
+    <section class="py-5 bg-warning text-dark text-center">
+        <h3 class="fw-bold mb-3">Chceš se přidat do klubu?</h3>
+        <p class="mb-4">
+            Stačí se zaregistrovat a můžeš se účastnit všech našich událostí, turnajů a herních večerů!
+        </p>
+
+        {if !$user->isLoggedIn()}
+            <a n:href="Sign:in" class="btn btn-dark btn-lg me-2">Přihlásit se</a>
+            <a n:href="Sign:up" class="btn btn-outline-dark btn-lg">Vytvořit účet</a>
+        {else}
+            <a n:href="Event:default" class="btn btn-dark btn-lg">Zobrazit události</a>
+        {/if}
+    </section>
+
+</div>
+
+{/block}

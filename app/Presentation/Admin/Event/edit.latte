@@ -1,0 +1,13 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">
+        {if $presenter->getParameter('id')}
+            ✏️ Upravit událost
+        {else}
+            ➕ Přidat událost
+        {/if}
+    </h2>
+
+    {control eventForm}
+</div>
+{/block}

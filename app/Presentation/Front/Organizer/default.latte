@@ -1,0 +1,105 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">👤 Moje akce</h2>
+
+    <div class="card mb-5 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">📅 Plánované události</h4>
+        </div>
+        <div class="card-body">
+            {if count($upcomingEvents) > 0}
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Název</th>
+                            <th>Datum</th>
+                            <th>Stav zápisu</th>
+                            <th>Moderace</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $upcomingEvents as $ev}
+                            <tr>
+                                <td class="fw-bold">
+                                    <a n:href=":Front:Event:detail, id => $ev->id">{$ev->title}</a>
+                                </td>
+                                <td>{$ev->start_time|date:'j.n.Y H:i'}</td>
+                                
+                                <td>
+                                    {if $ev->status === 'open'}
+                                        <span class="badge bg-success">Otevřeno</span>
+                                    {else}
+                                        <span class="badge bg-secondary">Zavřeno</span>
+                                    {/if}
+                                </td>
+
+                                <td>
+                                    {var $mod = $ev->related('event_moderation')->fetch()}
+                                    {if $mod}
+                                        {if $mod->status === 'approved'}
+                                            <span class="badge bg-success">✅ Schváleno</span>
+                                        {elseif $mod->status === 'rejected'}
+                                            <span class="badge bg-danger">❌ Zamítnuto</span>
+                                        {else}
+                                            <span class="badge bg-warning text-dark">⏳ Čeká na schválení</span>
+                                        {/if}
+                                    {else}
+                                        <span class="text-muted">-</span>
+                                    {/if}
+                                </td>
+
+                                <td>
+                                    <a n:href=":Admin:Event:edit, id => $ev->id" class="btn btn-sm btn-primary">
+                                        ✏️ Upravit
+                                    </a>
+                                </td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+                <a n:href=":Front:Event:create" class="btn btn-outline-primary">+ Vytvořit novou</a>
+            {else}
+                <p class="text-muted my-2">Nemáte žádné plánované události.</p>
+                <a n:href=":Front:Event:create" class="btn btn-outline-primary">+ Vytvořit novou</a>
+            {/if}
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-secondary">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">🗄️ Archivované / Proběhlé</h4>
+        </div>
+        <div class="card-body">
+            {if count($pastEvents) > 0}
+                <div class="table-responsive">
+                    <table class="table text-muted">
+                        <thead>
+                            <tr>
+                                <th>Název</th>
+                                <th>Datum</th>
+                                <th>Akce</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach $pastEvents as $ev}
+                                <tr>
+                                    <td>{$ev->title}</td>
+                                    <td>{$ev->start_time|date:'j.n.Y H:i'}</td>
+                                    <td>
+                                        <a n:href=":Front:Event:detail, id => $ev->id" class="btn btn-sm btn-outline-secondary">
+                                            👁️ Zobrazit (Read-only)
+                                        </a>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            {else}
+                <p class="text-muted mb-0">Historie je prázdná.</p>
+            {/if}
+        </div>
+    </div>
+</div>
+{/block}

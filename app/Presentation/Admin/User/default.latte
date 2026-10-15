@@ -1,0 +1,55 @@
+{block content}
+<h2>Seznam uživatelů</h2>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Avatar</th>
+            <th>Jméno</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Detail</th>
+            <th>Upravit</th>
+            <th>Smazat</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr n:foreach="$userData as $u">
+            <td>{$u->id}</td>
+
+            <td>
+                {if $u->image}
+                    <img src="{$basePath}/{$u->image}" 
+                         alt="Avatar" 
+                         style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                {else}
+                    <img src="{$basePath}/upload/avatars/default.png"
+                         alt="No avatar"
+                         style="width:40px; height:40px; border-radius:50%; opacity:0.5;">
+                {/if}
+            </td>
+
+            <td>{$u->username}</td>
+            <td>{$u->email}</td>
+            
+            {* ИЗМЕНЕНИЕ: Используем ref() для получения имени роли из таблицы roles *}
+            <td>{$u->ref('roles', 'role_id')->name}</td>
+
+            <td><a n:href="detail $u->id" class="btn btn-sm btn-outline-primary">Zobrazit</a></td>
+            <td><a n:href="edit id => $u->id" class="btn btn-sm btn-outline-warning">Upravit</a></td>
+
+            {if $user->isLoggedIn() && $user->getIdentity()->id !== $u->id}
+                <td>
+                    <a n:href="delete! $u->id"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Opravdu chcete smazat tohoto uživatele?')">
+                        Smazat
+                    </a>
+                </td>
+            {/if}
+
+        </tr>
+    </tbody>
+</table>
+{/block}

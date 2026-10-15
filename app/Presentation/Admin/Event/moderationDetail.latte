@@ -1,0 +1,18 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">🔍 Přezkum události</h2>
+
+    {* Инфо-карточки оставьте как есть ... *}
+    <div class="card mb-4">...</div>
+    <div class="card mb-4">...</div>
+
+    <h4 class="mb-3">Rozhodnutí a úprava:</h4>
+    
+    {* Форма будет отрисована с соответствующими кнопками в зависимости от роли пользователя *}
+    {control moderationForm}
+
+    <p class="mt-4">
+        <a n:href="moderation" class="btn btn-secondary">← Zpět na seznam</a>
+    </p>
+</div>
+{/block}

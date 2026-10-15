@@ -1,0 +1,296 @@
+{block content}
+
+<style>
+    /* Custom compact styles for this page */
+    .compact-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .avatar-small {
+        width: 24px;
+        height: 24px;
+        object-fit: cover;
+    }
+    .avatar-medium {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+    }
+    .scrollable-box {
+        overflow-y: auto;
+        scrollbar-width: thin; /* Firefox */
+    }
+    .scrollable-box::-webkit-scrollbar {
+        width: 6px;
+    }
+    .scrollable-box::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+    .event-header {
+        background: #fff;
+        border-bottom: 2px solid #f79c42;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .info-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .info-value {
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="compact-container">
+
+    {* 1. Alert if event is past *}
+    {if $isPast}
+        <div class="alert alert-secondary py-2 mb-3 small shadow-sm">
+            🔒 <strong>Archivováno.</strong> Událost již proběhla. Úpravy a chat jsou uzamčeny.
+        </div>
+    {/if}
+
+    <div class="row g-4">
+        
+        {* === LEFT COLUMN: Main Content === *}
+        <div class="col-lg-8">
+            
+            {* HEADER: Title & Organizer *}
+            <div class="event-header d-flex justify-content-between align-items-end flex-wrap">
+                <div>
+                    <h2 class="fw-bold mb-1 text-dark">{$event->title}</h2>
+                    
+                    {* Compact Organizer Info *}
+                    <div class="d-flex align-items-center mt-2">
+                        <span class="text-muted small me-2">Organizátor:</span>
+                        {var $organizer = $event->ref('users', 'organizer_id')}
+                        <img src="{$basePath}/{$organizer->image ?: 'upload/avatars/default.png'}" 
+                             class="rounded-circle border me-1 avatar-small" alt="Avatar">
+                        <span class="fw-bold text-dark small">{$organizer->username}</span>
+                    </div>
+                </div>
+
+                {* Action Buttons (Top Right) *}
+                {if $isOrganizer || $isAdmin || $isModerator}
+                    <div class="d-flex gap-1 mt-2 mt-md-0">
+                        {if !$isPast}
+                            <a n:href=":Admin:Event:edit, id => $event->id" class="btn btn-warning btn-sm py-0" title="Upravit">✏️</a>
+                        {/if}
+                        {if $isAdmin || $isModerator}
+                            <a n:href="deleteEvent! id => $event->id" class="btn btn-danger btn-sm py-0" 
+                               onclick="return confirm('Smazat událost?')" title="Smazat">🗑️</a>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+
+            {* INFO GRID: Date, Location, Game, Status *}
+            <div class="card bg-light border-0 mb-3 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="row g-3">
+                        {* 1. Kdy *}
+                        <div class="col-6 col-md-3">
+                            <div class="info-label">📅 Začátek</div>
+                            <div class="info-value">{$event->start_time|date:'j. n. Y H:i'}</div>
+                            
+                            {if $event->end_time}
+                                <div class="mt-2">
+                                    <div class="info-label">🏁 Konec</div>
+                                    <div class="info-value text-muted small">{$event->end_time|date:'j. n. Y H:i'}</div>
+                                </div>
+                            {/if}
+                        </div>
+
+                        {* 2. Kde *}
+                        <div class="col-6 col-md-3">
+                            <div class="info-label">📍 Kde</div>
+                            <div class="info-value">{$event->location}</div>
+                        </div>
+
+                        {* 3. Hra *}
+                        <div class="col-6 col-md-3">
+                            <div class="info-label">🎮 Hra</div>
+                            {if $event->game_id}
+                                {var $game = $event->ref('games', 'game_id')}
+                                <div class="info-value">{$game->name}</div>
+                                {if $game->genre}<small class="badge bg-white text-secondary border">{$game->genre}</small>{/if}
+                            {else}
+                                <span class="text-muted small">-</span>
+                            {/if}
+                        </div>
+
+                        {* 4. Stav (НОВАЯ КОЛОНКА) *}
+                        <div class="col-6 col-md-3">
+                            <div class="info-label">📊 Stav</div>
+                            <div class="info-value">
+                                {if $event->status === 'open'}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2">Otevřeno</span>
+                                {elseif $event->status === 'closed'}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-2">Zavřeno</span>
+                                {elseif $event->status === 'canceled'}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2">Zrušeno</span>
+                                {else}
+                                    <span class="badge bg-light text-dark border px-2">{$event->status}</span>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {* DESCRIPTION *}
+            <div class="mb-4">
+                <h6 class="fw-bold border-bottom pb-1 mb-2">Popis</h6>
+                <div class="text-break small text-secondary" style="line-height: 1.6;">
+                    {$event->description|breaklines}
+                </div>
+            </div>
+
+            {* JOIN / LEAVE BUTTONS *}
+            {if !$isPast}
+                <div class="d-flex align-items-center gap-3 p-3 bg-white border rounded shadow-sm">
+                    {if !$isJoined}
+                        {* Если событие закрыто (статус не open), блокируем кнопку, если пользователь не орг/админ *}
+                        {if $event->status === 'open' || $isOrganizer || $isAdmin || $isModerator}
+                            <a n:href="join! id => $event->id" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">
+                                👋 Připojit se
+                            </a>
+                            <span class="text-muted small">Přidejte se k nám!</span>
+                        {else}
+                            <button class="btn btn-secondary btn-sm px-4 disabled">⛔ Zápis uzavřen</button>
+                        {/if}
+                    {else}
+                        <button class="btn btn-success btn-sm px-4 disabled opacity-100 fw-bold">
+                            ✅ Přihlášen(a)
+                        </button>
+                        <a n:href="leave! id => $event->id" class="text-danger small text-decoration-underline" 
+                           onclick="return confirm('Opustit?')">Odhlásit se</a>
+                    {/if}
+                </div>
+            {/if}
+        </div>
+
+        {* === RIGHT COLUMN: Sidebar (Participants & Chat) === *}
+        <div class="col-lg-4 d-flex flex-column gap-3">
+            
+            {* 1. PARTICIPANTS CARD *}
+            <div class="card shadow-sm">
+                <div class="card-header bg-light py-2 px-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 small fw-bold">👥 Účastníci</h6>
+                    <span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">{$participantsCount}</span>
+                </div>
+                
+                <div class="card-body p-0 scrollable-box" style="max-height: 200px;">
+                    {if $participantsCount > 0}
+                        <ul class="list-group list-group-flush">
+                            {foreach $participants as $participantRow}
+                                {var $pUser = $participantRow->ref('users', 'user_id')}
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3 border-bottom-0">
+                                    <div class="d-flex align-items-center text-truncate">
+                                        <img src="{$basePath}/{$pUser->image ?: 'upload/avatars/default.png'}" 
+                                             class="rounded-circle border me-2 avatar-medium">
+                                        <span class="small fw-bold text-dark text-truncate" style="max-width: 100px;">
+                                            {$pUser->username}
+                                        </span>
+                                    </div>
+                                    
+                                    {if ($isOrganizer || $isAdmin || $isModerator) && $pUser->id !== $user->id}
+                                        <div class="d-flex gap-1">
+                                            <a n:href="kick! userId => $pUser->id" class="text-secondary" title="Vyhodit"
+                                               onclick="return confirm('Vyhodit?')">❌</a>
+                                            <a n:href="block! userId => $pUser->id" class="text-danger" title="Blokovat"
+                                               onclick="return confirm('Blokovat?')">🚫</a>
+                                        </div>
+                                    {/if}
+                                </li>
+                            {/foreach}
+                        </ul>
+                    {else}
+                        <div class="text-center text-muted py-4 small">Nikdo.</div>
+                    {/if}
+                </div>
+            </div>
+
+            {* 2. BLOCKED USERS *}
+            {if !empty($blockedUsers)}
+                <div class="card shadow-sm border-danger">
+                    <div class="card-header bg-danger text-white py-1 px-3">
+                        <small class="fw-bold">🚫 Blokovaní ({count($blockedUsers)})</small>
+                    </div>
+                    <div class="card-body p-0 scrollable-box" style="max-height: 150px;">
+                        <ul class="list-group list-group-flush">
+                            {foreach $blockedUsers as $bRow}
+                                {var $bUser = $bRow->ref('users', 'user_id')}
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-3 small">
+                                    <span class="text-muted">{$bUser->username}</span>
+                                    <a n:href="unblock! userId => $bUser->id" class="btn btn-sm btn-outline-success py-0 px-1" style="font-size: 0.7rem;">🔓</a>
+                                </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {/if}
+
+            {* 3. CHAT CARD *}
+            <div class="card shadow-sm flex-grow-1" style="min-height: 300px;">
+                <div class="card-header bg-light py-2 px-3">
+                    <h6 class="mb-0 small fw-bold">💬 Chat</h6>
+                </div>
+
+                <div id="chat-box" class="card-body p-2 bg-white scrollable-box" style="height: 250px;">
+                    {if $canViewChat}
+                        {if count($chatMessages) > 0}
+                            {foreach $chatMessages as $msg}
+                                <div class="mb-2 p-2 rounded bg-light border {if $user->isLoggedIn() && $msg->user_id === $user->id}ms-4 border-primary bg-opacity-10{else}me-4{/if}">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <strong style="font-size: 0.7rem; color: #d77b1f;">{$msg->username}</strong>
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-muted" style="font-size: 0.65rem;">{$msg->created_at|date:'H:i'}</span>
+                                            {if $isAdmin || $isModerator}
+                                                <a n:href="deleteMessage! messageId => $msg->id" class="text-danger ms-2 text-decoration-none fw-bold" 
+                                                   style="font-size: 0.7rem; line-height: 1;" onclick="return confirm('×?')">×</a>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 small text-break">{$msg->content}</p>
+                                </div>
+                            {/foreach}
+                        {else}
+                            <div class="text-center text-muted mt-5 small">Žádné zprávy.</div>
+                        {/if}
+                    {else}
+                        <div class="alert alert-warning small m-2">Pro chat se připojte.</div>
+                    {/if}
+                </div>
+
+                {if $canChat}
+                    <div class="card-footer p-2 bg-light">
+                        {form chatForm}
+                            <div class="input-group input-group-sm">
+                                {input content, class => 'form-control', placeholder => 'Zpráva...', autocomplete => 'off'}
+                                <button n:name="send" class="btn btn-primary px-3">➤</button>
+                            </div>
+                        {/form}
+                    </div>
+                {/if}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{block scripts}
+    {include parent}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var chatBox = document.getElementById("chat-box");
+            if (chatBox) { chatBox.scrollTop = chatBox.scrollHeight; }
+        });
+    </script>
+{/block}
+{/block}

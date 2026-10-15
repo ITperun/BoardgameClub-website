@@ -1,0 +1,24 @@
+{block content}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">📋 Detail události</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Název:</strong> {$event->title}</p>
+            <p><strong>Místo:</strong> {$event->location}</p>
+            <p><strong>Začátek:</strong> {$event->start_time|date:'j.n.Y H:i'}</p>
+            <p><strong>Konec:</strong> {$event->end_time|date:'j.n.Y H:i'}</p>
+            {if $event->game}
+                <p><strong>Hra:</strong> {$event->game->name}</p>
+            {/if}
+            <p><strong>Popis:</strong></p>
+            <p style="background: #f5f5f5; padding: 1rem; border-radius: 4px;">{$event->description}</p>
+        </div>
+    </div>
+
+    <p class="mt-3">
+        <a n:href="default" class="btn btn-secondary">← Zpět na seznam</a>
+        <a n:href="edit, id => $event->id" class="btn btn-primary ms-2">Upravit</a>
+    </p>
+</div>
+{/block}

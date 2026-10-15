@@ -1,0 +1,41 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .header { background-color: #007bff; color: white; padding: 15px; border-radius: 5px; text-align: center; }
+        .content { padding: 20px 0; }
+        .info-block { background-color: #f8f9fa; padding: 15px; margin: 10px 0; border-left: 4px solid #007bff; border-radius: 3px; }
+        .label { font-weight: bold; color: #555; }
+        .value { color: #333; margin-left: 10px; }
+        .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Nová registrace uživatele</h1>
+        </div>
+
+        <div class="content">
+            <p>Dobrý den,</p>
+            <p>V systému MOP se právě registroval nový uživatel. Zde jsou jeho údaje:</p>
+
+            <div class="info-block">
+                <p><span class="label">Uživatelské jméno:</span><span class="value">{$username}</span></p>
+                <p><span class="label">Jméno a příjmení:</span><span class="value">{$firstname} {$lastname}</span></p>
+                <p><span class="label">E-mailová adresa:</span><span class="value">{$userEmail}</span></p>
+                <p><span class="label">Datum a čas registrace:</span><span class="value">{$registrationDate}</span></p>
+            </div>
+
+            <p>Pokud potřebujete toto registraci ověřit nebo provést nějakou akci, přihlaste se do administračního panelu.</p>
+        </div>
+
+        <div class="footer">
+            <p>Toto je automatické oznámení z systému MOP. Prosím, neodpovídejte na tento e-mail.</p>
+            <p>&copy; 2026 MOP System. Všechna práva vyhrazena.</p>
+        </div>
+    </div>
+</body>
+</html>
